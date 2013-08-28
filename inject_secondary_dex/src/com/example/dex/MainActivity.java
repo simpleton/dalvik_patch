@@ -31,13 +31,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import dalvik.system.DexClassLoader;
 
 public class MainActivity extends Activity {
     private static final String SECONDARY_DEX_NAME = "secondary_dex.jar";
-    
+    private static final String TAG = "DexInjectActivity";
     // Buffer size for file copying.  While 8kb is used in this sample, you
     // may want to tweak it based on actual size of the secondary dex file involved.
     private static final int BUF_SIZE = 8 * 1024;
@@ -64,6 +65,7 @@ public class MainActivity extends Activity {
         } else {
             mToastButton.setEnabled(true);
             DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath());
+            Log.d(TAG, "[onCreate]dexInternalStoragePath:" + dexInternalStoragePath.getAbsolutePath());
         }
 
         mToastButton.setOnClickListener(new View.OnClickListener() {
@@ -115,7 +117,7 @@ public class MainActivity extends Activity {
         }
     }
     
-    private class PrepareDexTask extends AsyncTask<File, Void, Boolean> {
+    private class PrepareDexTask extends AsyncTask<File, Void, File> {
 
         @Override
         protected void onCancelled() {
@@ -124,20 +126,17 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
+        protected void onPostExecute(File dexInternalStoragePath) {
+            super.onPostExecute(dexInternalStoragePath);
             if (mProgressDialog != null) mProgressDialog.cancel();
+            Log.d(TAG, "[AsyncTask]dexInternalStoragePath:" + dexInternalStoragePath.getAbsolutePath());
+            DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath());
         }
 
         @Override
-        protected Boolean doInBackground(File... dexInternalStoragePaths) {
-        	try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+        protected File doInBackground(File... dexInternalStoragePaths) {
             prepareDex(dexInternalStoragePaths[0]);
-            return null;
+            return dexInternalStoragePaths[0];
         }
     }
 }

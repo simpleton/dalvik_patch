@@ -71,8 +71,7 @@ public class DexInjector {
 	}
 	
 	private static Boolean inject_GE_api14(Application app, String libPath) {
-		PathClassLoader pathClassLoader = (PathClassLoader) app
-				.getClassLoader();
+		PathClassLoader pathClassLoader = (PathClassLoader) app.getClassLoader();
 		DexClassLoader dexClassLoader = new DexClassLoader(libPath, 
 															app.getDir("dex", 0).getAbsolutePath(), 
 															libPath, app.getClassLoader());
