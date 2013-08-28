@@ -22,6 +22,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.KeyStore.LoadStoreParameter;
+
+import com.example.dex.lib.LibraryProvider;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -60,31 +63,13 @@ public class MainActivity extends Activity {
             (new PrepareDexTask()).execute(dexInternalStoragePath);
         } else {
             mToastButton.setEnabled(true);
+            DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath());
         }
-        
+
         mToastButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                // Internal storage where the DexClassLoader writes the optimized dex file to.
-                final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
-                
-                // Initialize the class loader with the secondary dex file.
-                DexClassLoader cl = new DexClassLoader(dexInternalStoragePath.getAbsolutePath(),
-                        optimizedDexOutputPath.getAbsolutePath(),
-                        null,
-                        getClassLoader());
-                Class libProviderClazz = null;
-                
                 try {
-                    // Load the library class from the class loader.
-                    libProviderClazz =
-                            cl.loadClass("com.example.dex.lib.LibraryProvider");
-                    
-                    // Cast the return object to the library interface so that the
-                    // caller can directly invoke methods in the interface.
-                    // Alternatively, the caller can invoke methods through reflection,
-                    // which is more verbose and slow.
-                    LibraryInterface lib = (LibraryInterface) libProviderClazz.newInstance();
-                    
+                	LibraryProvider lib = new LibraryProvider();
                     // Display the toast!
                     lib.showAwesomeToast(view.getContext(), "hello");
                 } catch (Exception exception) {
@@ -146,6 +131,11 @@ public class MainActivity extends Activity {
 
         @Override
         protected Boolean doInBackground(File... dexInternalStoragePaths) {
+        	try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
             prepareDex(dexInternalStoragePaths[0]);
             return null;
         }

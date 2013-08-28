@@ -14,6 +14,13 @@ import dalvik.system.PathClassLoader;
 
 public class DexInjector {
 	
+	/**
+	 * TODO:
+	 * maybe the system load our injected dex asynchronously. so we should inject our dex as early as possible 
+	 * @param app
+	 * @param path
+	 * @return
+	 */
 	public static final Boolean inject(Application app, String path) {
 		Boolean result;
 		if (Build.VERSION.SDK_INT >= 14) {
