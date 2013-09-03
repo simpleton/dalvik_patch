@@ -17,11 +17,21 @@
 package com.example.dex.lib;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.dex.LibraryInterface;
 
 public class LibraryProvider implements LibraryInterface {
+	private static final String TAG = "LibraryProvider";
+	
+	public LibraryProvider() {
+		Log.e(TAG, "LibraryProvider");
+	}
+	static {
+		Log.e(TAG, "LibraryProvider simsun");
+		print_log();
+	}
     public void showAwesomeToast(Context context, String message) {
         if (context == null) {
             return;
@@ -29,5 +39,9 @@ public class LibraryProvider implements LibraryInterface {
         Toast.makeText(context,
                        String.format("++ %s ++", message),
                        Toast.LENGTH_LONG).show();
+    }
+    
+    public static void print_log() {
+    	Log.e(TAG, "print_log");
     }
 }

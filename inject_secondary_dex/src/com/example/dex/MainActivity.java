@@ -22,9 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.KeyStore.LoadStoreParameter;
-
-import com.example.dex.lib.LibraryProvider;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -34,7 +31,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import dalvik.system.DexClassLoader;
+
+import com.example.dex.lib.LibraryProvider;
 
 public class MainActivity extends Activity {
     private static final String SECONDARY_DEX_NAME = "secondary_dex.jar";
@@ -42,10 +40,12 @@ public class MainActivity extends Activity {
     // Buffer size for file copying.  While 8kb is used in this sample, you
     // may want to tweak it based on actual size of the secondary dex file involved.
     private static final int BUF_SIZE = 8 * 1024;
-    
+    static {
+    	Log.e("TAG", "MainActivity");
+    }
     private Button mToastButton = null;
     private ProgressDialog mProgressDialog = null;
-    
+    private File dexInternalStoragePath;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
         
         // Before the secondary dex file can be processed by the DexClassLoader,
         // it has to be first copied from asset resource to a storage location.
-        final File dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
+        dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
                 SECONDARY_DEX_NAME);
         if (!dexInternalStoragePath.exists()) {
             mProgressDialog = ProgressDialog.show(this,
@@ -64,24 +64,61 @@ public class MainActivity extends Activity {
             (new PrepareDexTask()).execute(dexInternalStoragePath);
         } else {
             mToastButton.setEnabled(true);
-            DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath());
             Log.d(TAG, "[onCreate]dexInternalStoragePath:" + dexInternalStoragePath.getAbsolutePath());
+          
         }
+        DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath());
 
         mToastButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 try {
-                	LibraryProvider lib = new LibraryProvider();
-                    // Display the toast!
-                    lib.showAwesomeToast(view.getContext(), "hello");
+
+                	create_second_dex_obj(view);
                 } catch (Exception exception) {
                     // Handle exception gracefully here.
                     exception.printStackTrace();
                 }
             }
+
+
         });
     }
+	private void create_second_dex_obj(View view) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+		//LibraryProvider lib = new LibraryProvider();
+				Class<?> clazz = null;
+				try {
+					clazz = Class.forName("com.example.dex.lib.LibraryProvider");
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				LibraryProvider lib;
+				try {
+					if (clazz != null) {
+						lib = (LibraryProvider) clazz.newInstance();
+						lib.showAwesomeToast(view.getContext(), "hello");
+					}
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    	TestClass.test(view.getContext());		
+	}
+	
+    @Override
+    protected void onStart() {
+      
+    	super.onStart();
+    }
     
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	
+    }
     // File I/O code to copy the secondary dex file from asset resource to internal storage.
     private boolean prepareDex(File dexInternalStoragePath) {
         BufferedInputStream bis = null;
@@ -130,7 +167,6 @@ public class MainActivity extends Activity {
             super.onPostExecute(dexInternalStoragePath);
             if (mProgressDialog != null) mProgressDialog.cancel();
             Log.d(TAG, "[AsyncTask]dexInternalStoragePath:" + dexInternalStoragePath.getAbsolutePath());
-            DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath());
         }
 
         @Override
