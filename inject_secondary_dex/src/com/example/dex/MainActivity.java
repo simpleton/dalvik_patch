@@ -85,27 +85,26 @@ public class MainActivity extends Activity {
     }
 	private void create_second_dex_obj(View view) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
 		//LibraryProvider lib = new LibraryProvider();
-				Class<?> clazz = null;
-				try {
-					clazz = Class.forName("com.example.dex.lib.LibraryProvider");
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				LibraryProvider lib;
-				try {
-					if (clazz != null) {
-						lib = (LibraryProvider) clazz.newInstance();
-						lib.showAwesomeToast(view.getContext(), "hello");
-					}
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    	TestClass.test(view.getContext());		
+		Class<?> clazz = null;
+		try {
+			clazz = Class.forName("com.example.dex.lib.LibraryProvider");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LibraryProvider lib;
+		try {
+			if (clazz != null) {
+				lib = (LibraryProvider) clazz.newInstance();
+				lib.showAwesomeToast(view.getContext(), "hello");
+			}
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
     @Override
