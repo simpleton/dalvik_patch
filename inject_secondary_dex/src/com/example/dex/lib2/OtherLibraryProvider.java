@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.dex.lib;
+package com.example.dex.lib2;
 
 import android.content.Context;
 import android.util.Log;
@@ -22,14 +22,14 @@ import android.widget.Toast;
 
 import com.example.dex.LibraryInterface;
 
-public class LibraryProvider implements LibraryInterface {
-	private static final String TAG = "LibraryProvider";
+public class OtherLibraryProvider implements LibraryInterface {
+	private static final String TAG = "OhterLibraryProvider";
 	
-	public LibraryProvider() {
-		Log.e(TAG, "LibraryProvider");
+	public OtherLibraryProvider() {
+		Log.e(TAG, "OhterLibraryProvider");
 	}
 	static {
-		Log.e(TAG, "LibraryProvider simsun");
+		Log.e(TAG, "OhterLibraryProvider simsun");
 		print_log();
 	}
     public void showAwesomeToast(Context context, String message) {
@@ -37,7 +37,7 @@ public class LibraryProvider implements LibraryInterface {
             return;
         }
         Toast.makeText(context,
-                       String.format("second++ %s ++", message),
+                       String.format("third++ %s ++", message),
                        Toast.LENGTH_LONG).show();
     }
     

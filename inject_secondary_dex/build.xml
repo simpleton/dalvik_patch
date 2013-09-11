@@ -141,11 +141,13 @@
                 <!-- default dex and the secondary dex. -->
                 <mkdir dir="${out.classes.absolute.dir}.1"/>
                 <mkdir dir="${out.classes.absolute.dir}.2"/>
-
+				<mkdir dir="${out.classes.absolute.dir}.3"/>
+				
                 <!-- Primary dex to include everything but the concrete library implementation. -->
                 <copy todir="${out.classes.absolute.dir}.1" >
                     <fileset dir="${out.classes.absolute.dir}" >
                         <exclude name="com/example/dex/lib/**" />
+                        <exclude name="com/example/dex/lib2/**" />
                     </fileset>
                 </copy>
                 <!-- Secondary dex to include the concrete library implementation. -->
@@ -154,17 +156,33 @@
                         <include name="com/example/dex/lib/**" />
                     </fileset>
                 </copy>
+                
+                <!-- Secondary dex to include the concrete library implementation. -->
+                <copy todir="${out.classes.absolute.dir}.3" >
+                    <fileset dir="${out.classes.absolute.dir}" >
+                        <include name="com/example/dex/lib2/**" />
+                    </fileset>
+                </copy>
 
                 <!-- Compile .class files from the two stage directories to the apppropriate dex files. -->
                 <dex-helper-mod input-dir="${out.classes.absolute.dir}.1"
                     output-dex-file="${out.absolute.dir}/${dex.file.name}" />
+                
                 <mkdir dir="${out.absolute.dir}/secondary_dex_dir" />
                 <dex-helper-mod input-dir="${out.classes.absolute.dir}.2"
                     output-dex-file="${out.absolute.dir}/secondary_dex_dir/classes.dex" />
+                
+                <mkdir dir="${out.absolute.dir}/third_dex_dir" />
+                <dex-helper-mod input-dir="${out.classes.absolute.dir}.3"
+                    output-dex-file="${out.absolute.dir}/third_dex_dir/classes.dex" />
                 <!-- Jar the secondary dex file so it can be consumed by the DexClassLoader. -->
                 <!-- Package the output in the assets directory of the apk. -->
                 <jar destfile="${asset.absolute.dir}/secondary_dex.jar"
                      basedir="${out.absolute.dir}/secondary_dex_dir" includes="classes.dex" />
+                
+                <jar destfile="${asset.absolute.dir}/third_dex.jar"
+                     basedir="${out.absolute.dir}/third_dex_dir" includes="classes.dex" />
+                
             </then>
             <else>
                 <echo>hasCode = false. Skipping...</echo>
