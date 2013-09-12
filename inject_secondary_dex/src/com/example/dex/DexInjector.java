@@ -21,24 +21,24 @@ public class DexInjector {
 	 * @param path
 	 * @return
 	 */
-	public static final Boolean inject(Application app, String path) {
+	public static final Boolean inject(Application app, String path, String dummy_class_name) {
 		Boolean result;
 		if (Build.VERSION.SDK_INT >= 14) {
-			result = inject_GE_api14(app, path);
+			result = inject_GE_api14(app, path, dummy_class_name);
 		} else {
-			result = inject_BL_api14(app, path);
+			result = inject_BL_api14(app, path, dummy_class_name);
 		}
 		return result;
 	}
 	
 	@SuppressLint("NewApi")
-	private static Boolean inject_BL_api14(Application app, String path) {
+	private static Boolean inject_BL_api14(Application app, String path, String dummy_class_name) {
 		Boolean result = true;
 		PathClassLoader path_classloader = (PathClassLoader) app.getClassLoader();
 		DexClassLoader dex_classloader = new DexClassLoader(path, app.getDir(
 				"dex", 0).getAbsolutePath(), path, app.getClassLoader());
 		try {
-			dex_classloader.loadClass("SecondDex");
+			dex_classloader.loadClass(dummy_class_name);
 			setField(path_classloader,
 					PathClassLoader.class,
 					"mPaths",
@@ -70,7 +70,7 @@ public class DexInjector {
 		return result;
 	}
 	
-	private static Boolean inject_GE_api14(Application app, String libPath) {
+	private static Boolean inject_GE_api14(Application app, String libPath, String dummy_class_name) {
 		PathClassLoader pathClassLoader = (PathClassLoader) app.getClassLoader();
 		DexClassLoader dexClassLoader = new DexClassLoader(libPath, 
 															app.getDir("dex", 0).getAbsolutePath(), 

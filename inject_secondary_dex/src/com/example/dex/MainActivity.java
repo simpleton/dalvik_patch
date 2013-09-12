@@ -36,6 +36,7 @@ import com.example.dex.lib.LibraryProvider;
 
 public class MainActivity extends Activity {
     private static final String SECONDARY_DEX_NAME = "secondary_dex.jar";
+    private static final String THIRD_DEX_NAME = "third_dex.jar";
     private static final String TAG = "DexInjectActivity";
     // Buffer size for file copying.  While 8kb is used in this sample, you
     // may want to tweak it based on actual size of the secondary dex file involved.
@@ -46,6 +47,7 @@ public class MainActivity extends Activity {
     private Button mToastButton = null;
     private ProgressDialog mProgressDialog = null;
     private File dexInternalStoragePath;
+    private File otherInternalStoragePath;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,24 +58,28 @@ public class MainActivity extends Activity {
         // it has to be first copied from asset resource to a storage location.
         dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
                 SECONDARY_DEX_NAME);
-        if (!dexInternalStoragePath.exists()) {
+        otherInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
+        		THIRD_DEX_NAME);
+        if (!dexInternalStoragePath.exists() || !otherInternalStoragePath.exists()) {
             mProgressDialog = ProgressDialog.show(this,
                     getResources().getString(R.string.diag_title), 
                     getResources().getString(R.string.diag_message), true, false);
             // Perform the file copying in an AsyncTask.
-            (new PrepareDexTask()).execute(dexInternalStoragePath);
+            (new PrepareDexTask()).execute(dexInternalStoragePath, otherInternalStoragePath);
         } else {
             mToastButton.setEnabled(true);
             Log.d(TAG, "[onCreate]dexInternalStoragePath:" + dexInternalStoragePath.getAbsolutePath());
           
         }
-        DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath());
-
+        DexInjector.inject(getApplication(), dexInternalStoragePath.getAbsolutePath(), "SecondDex");
+        DexInjector.inject(getApplication(), otherInternalStoragePath.getAbsolutePath(), "ThirdDex");
+        
         mToastButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View view) {
                 try {
-
-                	create_second_dex_obj(view);
+                	//TestClass.test(getApplicationContext());
+                	TestClass.test_other(getApplicationContext());
+                	//create_second_dex_obj(view);
                 } catch (Exception exception) {
                     // Handle exception gracefully here.
                     exception.printStackTrace();
@@ -119,12 +125,12 @@ public class MainActivity extends Activity {
     	
     }
     // File I/O code to copy the secondary dex file from asset resource to internal storage.
-    private boolean prepareDex(File dexInternalStoragePath) {
+    private boolean prepareDex(File dexInternalStoragePath, String dex_file) {
         BufferedInputStream bis = null;
         OutputStream dexWriter = null;
 
         try {
-            bis = new BufferedInputStream(getAssets().open(SECONDARY_DEX_NAME));
+            bis = new BufferedInputStream(getAssets().open(dex_file));
             dexWriter = new BufferedOutputStream(new FileOutputStream(dexInternalStoragePath));
             byte[] buf = new byte[BUF_SIZE];
             int len;
@@ -170,7 +176,8 @@ public class MainActivity extends Activity {
 
         @Override
         protected File doInBackground(File... dexInternalStoragePaths) {
-            prepareDex(dexInternalStoragePaths[0]);
+            prepareDex(dexInternalStoragePaths[0], SECONDARY_DEX_NAME);
+            prepareDex(dexInternalStoragePaths[1], THIRD_DEX_NAME);
             return dexInternalStoragePaths[0];
         }
     }
