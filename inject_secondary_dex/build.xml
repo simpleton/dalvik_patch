@@ -14,7 +14,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<project name="secondary_dex_sample" default="help">
+<project name="inject_secondary_dex" default="help">
 
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
